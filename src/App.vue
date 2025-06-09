@@ -1,85 +1,115 @@
-<script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
-
-  <RouterView />
+  <nav>
+    <h1>
+      <img src="./assets/logo.png" alt="logo" />
+      <p>ALRadwan</p>
+    </h1>
+    <router-link to="/">Home</router-link>
+    <router-link to="/cashier">Cashier</router-link>
+    <router-link to="/inventory">Inventory</router-link>
+    <router-link to="/accounts">Accounts</router-link>
+  </nav>
+  <router-view />
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+<style lang="scss">
+* {
+  scroll-behavior: smooth;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+body {
+  margin: 0;
+}
+
+#app {
+  display: flex;
+  font-family: 'Times New Roman', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+
+  .home,
+  .inventory,
+  .cashier,
+  .accounts {
+    min-height: 100vh;
+    flex-grow: 1;
+    padding-left: 140px;
+    background-color: #eef;
+  }
 }
 
 nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
+  position: fixed;
+  font-size: 1.1rem;
+  width: 140px;
+  height: calc(100vh - 30px);
+  background-color: #dfdfdf;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: start;
+  padding: 15px 0px;
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
+  h1 {
+    margin: 0 auto;
 
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
+    img {
+      max-width: 80px;
+      transform: rotate(180deg);
+    }
 
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
+    p {
+      margin: 0;
+      position: relative;
+      padding-bottom: 10px;
+      font-size: 23px;
 
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
+      &::before {
+        position: absolute;
+        content: '';
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background-color: #42b983;
+      }
+    }
   }
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
+  a {
+    transition: all 0.2s ease-in-out;
+    font-weight: bold;
+    color: #2c3e50;
+    text-decoration: none;
+    padding: 10px 20px;
+    background-color: #ccccccaa;
+    width: 100px;
     text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
 
-    padding: 1rem 0;
-    margin-top: 1rem;
+    &:hover {
+      color: white;
+      background-color: #42b983;
+    }
+
+    &.router-link-exact-active {
+      color: white;
+      background-color: #42b983;
+    }
   }
+}
+
+button {
+  cursor: pointer;
 }
 </style>
+
+<script>
+export default {
+  data() {
+    return {
+      Inventory: [],
+    }
+  },
+}
+</script>
