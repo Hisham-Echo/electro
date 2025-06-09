@@ -84,6 +84,7 @@
                           ? item.stockPackages
                           : item.stockUnits
                       "
+                      @change="updateCart()"
                     />
                   </td>
                   <td>$ {{ item.pricePerPack }}</td>
@@ -350,6 +351,10 @@ export default {
       document.body.removeChild(a);
 
       URL.revokeObjectURL(url);
+    },
+    updateCart() {
+      // Update the cart when quantity changes
+      localStorage.setItem("Cart", JSON.stringify(this.cart));
     },
   },
   mounted() {
