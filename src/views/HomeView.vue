@@ -13,6 +13,12 @@
     <div class="dorg">
       <div>
         Dorg: <span>${{ this.Dorg }}</span>
+        <br>
+        <br>
+        Visa: <span>${{ this.Visa }}</span>
+        <br>
+        <br>
+        Net Profit: <span>${{ (this.Dorg + this.Visa) * 0.1 }}</span>
       </div>
       <div>
         <button @click.prevent="resetDorg">Reset</button>
@@ -75,6 +81,7 @@ export default {
   data() {
     return {
       Dorg: 0,
+      Visa: 0,
     }
   },
   components: {
@@ -123,6 +130,8 @@ export default {
   mounted() {
     const savedDorg = JSON.parse(localStorage.getItem('Dorg'))
     this.Dorg = savedDorg ? savedDorg : 0
+    const savedVisa = JSON.parse(localStorage.getItem('Visa'))
+    this.Visa = savedVisa ? savedVisa : 0
   },
 }
 </script>

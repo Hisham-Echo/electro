@@ -6,13 +6,7 @@
         <header>
           <div class="cCode">
             <label for="c_code">Customer Code : </label>
-            <input
-              type="text"
-              name="c_code"
-              id="c_code"
-              v-model="customerCode"
-              @click.prevent
-            />
+            <input type="text" name="c_code" id="c_code" v-model="customerCode" @click.prevent />
           </div>
           <div class="customer">{{ getCustomerName() }}</div>
           <div class="precart">
@@ -20,6 +14,7 @@
               <span>Payment Method: </span>
               <select v-model="paymentMethod" id="payment-method">
                 <option value="cash">Cash</option>
+                <option value="visa">Visa</option>
                 <option value="2agel">2agel</option>
               </select>
             </div>
@@ -63,11 +58,7 @@
               <tbody>
                 <tr v-for="(item, index) in cart" :key="index">
                   <td :id="item.code">
-                    <button
-                      class="remove"
-                      @click.prevent="removeFromCart"
-                      title="remove from cart"
-                    >
+                    <button class="remove" @click.prevent="removeFromCart" title="remove from cart">
                       X
                     </button>
                     {{ item.code }}
@@ -79,12 +70,8 @@
                       type="number"
                       v-model="item.q"
                       :min="1"
-                      :max="
-                        productType === 'gomla'
-                          ? item.stockPackages
-                          : item.stockUnits
-                      "
-                      @change="updateCart()"
+                      :max="productType === 'gomla' ? item.stockPackages : item.stockUnits"
+                      @change="updateCart"
                     />
                   </td>
                   <td>$ {{ item.pricePerPack }}</td>
@@ -93,19 +80,12 @@
                     $
                     {{
                       (
-                        item.q *
-                        (productType === "gomla"
-                          ? item.pricePerPack
-                          : item.pricePerUnit)
+                        item.q * (productType === 'gomla' ? item.pricePerPack : item.pricePerUnit)
                       ).toFixed(2)
                     }}
                   </td>
                   <td>
-                    {{
-                      productType === "gomla"
-                        ? item.stockPackages
-                        : item.stockUnits
-                    }}
+                    {{ productType === 'gomla' ? item.stockPackages : item.stockUnits }}
                   </td>
                 </tr>
               </tbody>
@@ -126,9 +106,7 @@
         <!-- Total and Payment -->
         <footer>
           <div class="total-section">
-            <p v-if="productType == 'gomla'">
-              Total: ${{ calcTotalPrice.toFixed(2) }}
-            </p>
+            <p v-if="productType == 'gomla'">Total: ${{ calcTotalPrice.toFixed(2) }}</p>
             <p v-else>Total: ${{ calcTotalPrice2.toFixed(2) }}</p>
             <div v-if="paymentMethod === 'cash'">
               <label for="amount-paid">Amount Paid: </label>
@@ -158,67 +136,70 @@
 
 <script>
 export default {
-  name: "CashierView",
+  name: 'CashierView',
   data() {
     return {
       Accounts: [],
       Inventory: [],
       Dorg: 0,
+      Visa: 0,
       //
-      customerCode: "0",
-      customerName: "",
-      productCode: "",
+      customerCode: '0',
+      customerName: '',
+      productCode: '',
       //
       cart: [],
       totalPrice: 0,
-      paymentMethod: "cash",
-      productType: "gomla",
+      paymentMethod: 'cash',
+      productType: 'gomla',
       amountPaid: 0,
-    };
+    }
   },
   computed: {
     // Calculate the total price of the cart
     calcTotalPrice() {
       return this.cart.reduce((total, item) => {
-        return total + item.pricePerPack * item.q;
-      }, 0);
+        return total + item.pricePerPack * item.q
+      }, 0)
     },
     calcTotalPrice2() {
       return this.cart.reduce((total, item) => {
-        return total + item.pricePerUnit * item.q;
-      }, 0);
+        return total + item.pricePerUnit * item.q
+      }, 0)
+    },
+    // TODO: Implement net profit calculation
+    calcNetProfit() {
+      return null
     },
   },
   methods: {
     addToCart() {
       if (!this.productCode) {
-        alert("Please enter product code");
-        return;
+        alert('Please enter product code')
+        return
       }
 
-      const product = this.Inventory.find(
-        (item) => item.code === this.productCode
-      );
+      const product = this.Inventory.find((item) => item.code === this.productCode)
 
       if (!product) {
-        alert("Product not found in inventory");
-        return;
+        alert('Product not found in inventory')
+        return
       }
 
-      const existingItem = this.cart.find((item) => item.code === product.code);
+      const existingItem = this.cart.find((item) => item.code === product.code)
 
       if (existingItem) {
-        if (this.productType == "gomla") {
+        if (this.productType == 'gomla') {
           if (existingItem.q < product.quantity) {
-            existingItem.q++; // Add one package
+            existingItem.q++ // Add one package
           } else {
-            alert("Not enough packages in stock");
+            alert('Not enough packages in stock')
           }
         } else {
           if (existingItem.q < product.unitQuantity) {
-            existingItem.q++; // Add one unit
+            existingItem.q++ // Add one unit
           } else {
-            alert("Not enough units in stock");
+            alert('Not enough units in stock')
           }
         }
       } else {
@@ -227,147 +208,224 @@ export default {
           q: 1,
           stockPackages: product.quantity, // Keep track of original stock
           stockUnits: product.unitQuantity,
-        };
-        this.cart.push(newItem);
+        }
+        this.cart.push(newItem)
       }
 
-      localStorage.setItem("Cart", JSON.stringify(this.cart));
-      this.productCode = ""; // Reset input
+      localStorage.setItem('Cart', JSON.stringify(this.cart))
+      this.productCode = '' // Reset input
     },
     removeFromCart(event) {
       // remove item from cart
-      let id = event.target.parentElement.id;
-      this.cart = this.cart.filter((item) => item.code !== id);
-      localStorage.setItem("Cart", JSON.stringify(this.cart)); // Update storage
+      let id = event.target.parentElement.id
+      this.cart = this.cart.filter((item) => item.code !== id)
+      localStorage.setItem('Cart', JSON.stringify(this.cart)) // Update storage
+    },
+    // TODO: Implement printRecipt
+    printRecipt() {
+      // Print the receipt
+      const printWindow = window.open('', '_blank')
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Receipt</title>
+            <style>
+              body { font-family: Arial, sans-serif; }
+              header,main, footer { text-align: center; }
+              table { width: 100%; border-collapse: collapse; }
+              th, td { text-align: center; border: 1px solid #000; padding: 5px; }
+              tr { text-align: center; }
+              th { background-color: #f2f2f2; }
+              tfoot { font-weight: bold; }
+            </style>
+          </head>
+          <body>
+          <header>
+            <h3>Receipt</h3>
+            <p>Customer Code: ${this.customerCode}</p>
+            <p>Payment Method: ${this.paymentMethod}</p>
+            <p>Date: ${new Date().toLocaleString()}</p>
+          </header>
+          <main>
+              <table>
+                <thead>
+                  <th>Name</th>
+                  <th>Price</th>
+                  <th>Q</th>
+                  <th>Total</th>
+                </thead>
+                <tbody>
+                ${this.cart
+                  .map((item) => {
+                    return `
+                      <tr>
+                        <td>${item.name}</td>
+                        <td>$${
+                          this.productType === 'gomla' ? item.pricePerPack : item.pricePerUnit
+                        }</td>
+                        <td>${item.q}</td>
+                        <td>$${
+                          this.productType === 'gomla'
+                            ? (item.q * item.pricePerPack).toFixed(2)
+                            : (item.q * item.pricePerUnit).toFixed(2)
+                        }</td>
+                      </tr>`
+                  })
+                  .join('')}
+                </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3">Total</td>
+                  <td colspan="1">$${
+                    this.productType === 'gomla'
+                      ? this.calcTotalPrice.toFixed(2)
+                      : this.calcTotalPrice2.toFixed(2)
+                  }</td>
+                </tr>
+                </tfoot>
+              </table>
+          </main>
+          <footer>
+          </footer>
+
+          </body>
+        </html>
+      `)
+      printWindow.document.close()
+      printWindow.print()
     },
     sell() {
-      // TODO:
-      // take each quantity of sold product and subtract it from the quantity in inventory
-      const check = confirm("Confirm Sell");
+      const check = confirm('Confirm Sell')
       if (check) {
         if (this.cart.length === 0) {
-          alert("Cart is empty. Please add products before selling.");
-          return;
+          alert('Cart is empty. Please add products before selling.')
+          return
         }
         // Loop through cart and update inventory
         for (let i = 0; i < this.cart.length; i++) {
-          const cartItem = this.cart[i];
-          const inventoryItem = this.Inventory.find(
-            (item) => item.code === cartItem.code
-          );
+          const cartItem = this.cart[i]
+          const inventoryItem = this.Inventory.find((item) => item.code === cartItem.code)
 
           if (inventoryItem) {
-            if (this.productType === "gomla") {
+            if (this.productType === 'gomla') {
               // Selling by package
               if (inventoryItem.quantity >= cartItem.q) {
-                inventoryItem.quantity -= cartItem.q;
-                inventoryItem.unitQuantity -=
-                  cartItem.q * inventoryItem.unitsPerPack;
+                inventoryItem.quantity -= cartItem.q
+                inventoryItem.unitQuantity -= cartItem.q * inventoryItem.unitsPerPack
               } else {
-                alert(`Not enough stock for ${inventoryItem.name}`);
-                return;
+                alert(`Not enough stock for ${inventoryItem.name}`)
+                return
               }
             } else {
               // Selling by unit
               if (inventoryItem.unitQuantity >= cartItem.q) {
-                inventoryItem.unitQuantity -= cartItem.q;
+                inventoryItem.unitQuantity -= cartItem.q
                 inventoryItem.quantity = Math.floor(
-                  inventoryItem.unitQuantity / inventoryItem.unitsPerPack
-                );
+                  inventoryItem.unitQuantity / inventoryItem.unitsPerPack,
+                )
               } else {
-                alert(`Not enough stock for ${inventoryItem.name}`);
-                return;
+                alert(`Not enough stock for ${inventoryItem.name}`)
+                return
               }
             }
           }
         }
 
         // Update local storage with the new inventory data
-        localStorage.setItem("Inventory", JSON.stringify(this.Inventory));
+        localStorage.setItem('Inventory', JSON.stringify(this.Inventory))
 
         // Handle payment logic
-        if (this.paymentMethod === "cash") {
-          alert(`Transaction completed!`);
+        if (this.paymentMethod === 'cash') {
+          alert(`Transaction completed!`)
           // add to dorg
-          this.Dorg = this.calcTotalPrice.toFixed(2);
-          localStorage.setItem("Dorg", this.Dorg);
-        } else if (this.paymentMethod === "2agel") {
-          const customer = this.Accounts.find(
-            (acc) => acc.code === this.customerCode
-          );
+          this.Dorg = this.calcTotalPrice.toFixed(2)
+          localStorage.setItem('Dorg', this.Dorg)
+          // Print receipt
+          this.printRecipt()
+        } else if (this.paymentMethod === 'visa') {
+          alert(`Transaction completed!`)
+          // add to dorg
+          this.Visa = this.calcTotalPrice.toFixed(2)
+          localStorage.setItem('Visa', this.Visa)
+          // Print receipt
+          this.printRecipt()
+        } else if (this.paymentMethod === '2agel') {
+          const customer = this.Accounts.find((acc) => acc.code === this.customerCode)
           if (customer) {
-            customer.due = (customer.due || 0) + this.calcTotalPrice;
-            localStorage.setItem("Accounts", JSON.stringify(this.Accounts));
+            customer.due = (customer.due || 0) + this.calcTotalPrice
+            localStorage.setItem('Accounts', JSON.stringify(this.Accounts))
             alert(
               `Sale recorded on credit for ${
                 customer.name
-              }. Due amount: $${customer.due.toFixed(2)}`
-            );
+              }. Due amount: $${customer.due.toFixed(2)}`,
+            )
           }
+          // Print receipt
+          this.printRecipt()
         }
 
         // empty cart
-        this.cart = [];
-        localStorage.setItem("Cart", JSON.stringify(this.cart));
-        this.exportData();
+        this.cart = []
+        localStorage.setItem('Cart', JSON.stringify(this.cart))
+        this.exportData()
       }
     },
     getCustomerName() {
-      const customer = this.Accounts.find(
-        (account) => account.code === this.customerCode
-      );
-      return customer ? customer.name : "Customer not found";
+      const customer = this.Accounts.find((account) => account.code === this.customerCode)
+      return customer ? customer.name : 'Customer not found'
     },
 
     updateInventory(newInventory) {
-      this.Inventory = newInventory;
-      localStorage.setItem("Inventory", JSON.stringify(this.Inventory));
+      this.Inventory = newInventory
+      localStorage.setItem('Inventory', JSON.stringify(this.Inventory))
     },
 
     updateAccounts(newAccounts) {
-      this.Accounts = newAccounts;
-      localStorage.setItem("Accounts", JSON.stringify(this.Accounts));
+      this.Accounts = newAccounts
+      localStorage.setItem('Accounts', JSON.stringify(this.Accounts))
     },
 
     exportData() {
-      const localStorageData = {};
+      const localStorageData = {}
       for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        const value = localStorage.getItem(key);
-        localStorageData[key] = value;
+        const key = localStorage.key(i)
+        const value = localStorage.getItem(key)
+        localStorageData[key] = value
       }
 
       const blob = new Blob([JSON.stringify(localStorageData, null, 2)], {
-        type: "application/json",
-      });
-      const url = URL.createObjectURL(blob);
+        type: 'application/json',
+      })
+      const url = URL.createObjectURL(blob)
 
-      const a = document.createElement("a");
-      a.href = url;
-      const date = new Date();
-      a.download = `DATA@${date.toISOString()}.json`; // File name
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      const a = document.createElement('a')
+      a.href = url
+      const date = new Date()
+      a.download = `DATA@${date.toISOString()}.json` // File name
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
 
-      URL.revokeObjectURL(url);
+      URL.revokeObjectURL(url)
     },
     updateCart() {
       // Update the cart when quantity changes
-      localStorage.setItem("Cart", JSON.stringify(this.cart));
+      localStorage.setItem('Cart', JSON.stringify(this.cart))
     },
   },
   mounted() {
-    const savedInventory = JSON.parse(localStorage.getItem("Inventory"));
-    this.Inventory = savedInventory ? savedInventory : [];
-    const savedAccounts = JSON.parse(localStorage.getItem("Accounts"));
-    this.Accounts = savedAccounts ? savedAccounts : [];
-    const savedCart = JSON.parse(localStorage.getItem("Cart"));
-    this.cart = savedCart ? savedCart : [];
-    const savedDorg = JSON.parse(localStorage.getItem("Dorg"));
-    this.Dorg = savedDorg ? savedDorg : 0;
+    const savedInventory = JSON.parse(localStorage.getItem('Inventory'))
+    this.Inventory = savedInventory ? savedInventory : []
+    const savedAccounts = JSON.parse(localStorage.getItem('Accounts'))
+    this.Accounts = savedAccounts ? savedAccounts : []
+    const savedCart = JSON.parse(localStorage.getItem('Cart'))
+    this.cart = savedCart ? savedCart : []
+    const savedDorg = JSON.parse(localStorage.getItem('Dorg'))
+    this.Dorg = savedDorg ? savedDorg : 0
+    const savedVisa = JSON.parse(localStorage.getItem('Visa'))
+    this.Visa = savedVisa ? savedVisa : 0
   },
-};
+}
 </script>
 
 <style lang="scss" scoped>
