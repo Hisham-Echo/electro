@@ -2,7 +2,7 @@
   <nav>
     <h1>
       <img src="./assets/logo.png" alt="logo" />
-      <p>ALRadwan</p>
+      <p>Light Star</p>
     </h1>
     <router-link to="/">Home</router-link>
     <router-link to="/cashier">Cashier</router-link>

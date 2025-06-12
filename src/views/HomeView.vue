@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to ALRadwan" />
+    <HelloWorld msg="Welcome to Light Star" />
     <button class="load" @click.prevent="triggerFileInput">Load Data</button>
     <input
       type="file"
